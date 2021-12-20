@@ -1,0 +1,9 @@
+{
+    "compilerOptions":
+    {
+        "module": "commonjs",
+        "strict": true,
+        "jsx": "preserve",
+        "moduleResolution": "node"
+    }
+}
