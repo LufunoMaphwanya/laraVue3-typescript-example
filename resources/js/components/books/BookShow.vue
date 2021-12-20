@@ -42,8 +42,6 @@ export default {
 
        onMounted(() => getBook(props.id))
 
-       console.log(book);
-
        return {
            book
        }
