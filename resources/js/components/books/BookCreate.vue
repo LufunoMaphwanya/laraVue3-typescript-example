@@ -3,27 +3,27 @@
         <form @submit.prevent="saveBook">
             <div class="form-group">
                 <label>Title: </label>
-                <input type="text" class="form-control" placeholder="book title" v-model="form.title">
+                <input id="title" type="text" class="form-control" placeholder="book title" v-model="form.title">
             </div>
             <div class="form-group">
                 <label>Year: </label>
-                <input type="text" class="form-control" placeholder="book year" v-model="form.year">
+                <input type="text" class="form-control" placeholder="book year" v-model="form.year" id="year">
             </div>
             <div class="form-group">
                 <label>Author: </label>
-                <select class="form-control" v-model="form.author">
+                <select class="form-control" v-model="form.author" id="author">
                 <option v-for="author in authors" :key="author">{{ author }}</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>Publisher: </label>
-                <select class="form-control" v-model="form.publisher">
+                <select class="form-control" v-model="form.publisher" id="publisher">
                 <option v-for="publisher in publishers" :key="publisher">{{ publisher }}</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>Genre: </label>
-                <select class="form-control"  v-model="form.genre">
+                <select class="form-control"  v-model="form.genre" id="genre">
                 <option v-for="genre in genres" :key="genre">{{ genre }}</option>
                 </select>
             </div>

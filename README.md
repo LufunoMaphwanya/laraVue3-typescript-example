@@ -766,9 +766,239 @@ npm run test
 
 ## 2. Let's extend our app to support full CRUD ( TDD style ) 
 
-Create
+### create component BookCreate 
+
+```vue
+// resources/js/components/books/BookCreate.vue
+
+<template>
+    <div class="container">
+        <form @submit.prevent="saveBook">
+            <div class="form-group">
+                <label>Title: </label>
+                <input type="text" class="form-control" placeholder="book title" v-model="form.title">
+            </div>
+            <div class="form-group">
+                <label>Year: </label>
+                <input type="text" class="form-control" placeholder="book year" v-model="form.year">
+            </div>
+            <div class="form-group">
+                <label>Author: </label>
+                <select class="form-control" v-model="form.author">
+                <option v-for="author in authors" :key="author">{{ author }}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Publisher: </label>
+                <select class="form-control" v-model="form.publisher">
+                <option v-for="publisher in publishers" :key="publisher">{{ publisher }}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Genre: </label>
+                <select class="form-control"  v-model="form.genre">
+                <option v-for="genre in genres" :key="genre">{{ genre }}</option>
+                </select>
+            </div>
+            <div class="form-group"><br/>
+                <button :disabled="!submittable" type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</template>
+
+<script lang='ts'>
+import useBooks from '../../composables/books';
+import { reactive, computed } from 'vue';
+
+export default {
+    setup() {
+        const { errors, storeBook, authors, publishers, genres } = useBooks();
+
+        const form = reactive({
+            title: '',
+            author: '',
+            publisher: '',
+            genre: '',
+            year: null
+        })
+
+        const submittable = computed(() => {
+            return form.title !== '' && form.author !== ''
+            && form.publisher !== '' && form.genre !== '' && form.year !== null;
+        });
 
 
+        const saveBook = async () => {
+            await storeBook({ ...form })
+        }
+
+        return {
+            form,
+            errors,
+            saveBook,
+            authors,
+            publishers,
+            genres,
+            submittable
+        }
+    }
+}
+</script>
+```
+
+Let's add thsi to our routes so that we can access it in our app. 
+
+```ts
+// resources/js/router/index.ts
+
+//...
+,
+    {
+        path: '/books/create',
+        name: 'books.create',
+        component: BookCreate,
+    },
+
+//...
+```
+
+let's now add our create axios call in our composable books.ts and use vue-router to redirect our app to index page on success.
+read comments for explanations of changes 
+```ts
+// resources/js/composables/books.ts
+
+import { ref } from 'vue';
+import axios from "axios";
+import { useRouter } from 'vue-router'; // import vue router
+
+export default function useBooks() {
+    const books = ref([])
+    const book = ref([])
+    const errors = ref('') // stores errors coming from our call so that we can display 
+    const router = useRouter(); // instatiante vue-router
+
+    const authors = [ 'Terry A', 'Steven Price', 'John Smith', 'John Kennedy','Bryan Promise', 'Kyle David']; // fake authors options to select from when creating book
+    const publishers = [ 'Publisher A', 'Publisher B', 'Publisher C', 'Publisher D']; // fake publishers options to select from when creating book
+    const genres = ['Fiction', 'Non-Fiction', 'Business', 'Horror','Other']; // fake genres options to select from when creating book
+
+    const getBooks = async () => {
+        const response = await axios.get('/api/books');
+        books.value = response.data.data;
+    }
+
+    const getBook = async (id: number) => {
+        let response = await axios.get('/api/books/' + id)
+        book.value = response.data.data;
+    }
+
+    const storeBook = async (data: object) => {
+        errors.value = ''
+        try {
+            await axios.post('/api/books', data)
+            await router.push({name: 'books.index'}) // redirect app to index page on success 
+        } catch (e: any) {
+            if (e.response.status === 422) {
+                errors.value = e.response.data.errors
+            }
+        }
+    }
+
+    return {
+        authors,
+        publishers,
+        genres,
+        errors,
+        books,
+        book,
+        getBook,
+        getBooks,
+        storeBook
+    }
+}
+
+```
+
+Now let's write our component test, you will have noticed our component has a submittable check that checks that all values are filled. 
+it is implemented as a computed property - yes! instead of an old block spcifying computed props, we can now just do it like so.
+```vue
+
+import { ..., computed } from 'vue';
+...
+const submittable = computed(() => {
+            return form.title !== '' && form.author !== ''
+            && form.publisher !== '' && form.genre !== '' && form.year !== null;
+        });
+```
+
+anyways this is a good enough feature to write at least 2 test cases - one submittable must be false, and the other vice versa.
+
+jest test cases:
+1. it allows a user to submit if all values are filled.
+```js
+it("allows submit when all values are set", async () => {
+    // set up test component
+    // fill out all the fields correctly
+    //assert to be submittable
+    expect(wrapper.vm.submittable).toBe(true);
+  });
+
+```
+
+2. it disallows a user to submit if all values are not filled.
+```js
+it("disallows submit when all values are not set", async () => {
+    // set up test component
+    // fill out all the fields and leave out at least one
+    //assert to NOT be submittable
+    expect(wrapper.vm.submittable).toBe(false);
+  });
+```
+
+Our test
+
+```ts
+// resources/js/tests/components/books/BookCreate.spec.ts
+
+import { mount, shallowMount, flushPromises } from "@vue/test-utils";
+import BookCreate from "../../../components/books/BookCreate.vue";
+import router from "../../../router";
+
+describe("BookIndex.vue", () => {
+
+    beforeEach(() => {
+    })
+
+  it("allows submit when all values are set", async () => {
+    const wrapper = shallowMount(BookCreate, {
+      global: {
+        plugins: [router],
+      }
+    } as any);
+
+    await wrapper.find('#title').setValue('test title');
+    await wrapper.find('#year').setValue(1994);
+    await wrapper.find('#publisher').setValue('test p');
+    await wrapper.find('#author').setValue('test a');
+    await wrapper.find('#genre').setValue('test g');
+
+    expect(wrapper.vm.submittable).toBe(true);
+  });
+
+  it("disallows submit when all values are set", async () => {
+    const wrapper = shallowMount(BookCreate, {
+      global: {
+        plugins: [router],
+      }
+    } as any);
+
+    expect(wrapper.vm.submittable).toBe(false);
+  });
+});
+
+```
+
+at this point, adding  :EDIT and :DELETE functionality to this should be easy enough. but let's go ahead and complete this.
 
 Delete
 
