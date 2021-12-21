@@ -766,6 +766,20 @@ npm run test
 
 ## 2. Let's extend our app to support full CRUD ( TDD style ) 
 
+Create
+
+
+
+Delete
+
+
+
+
+
+Edit
+
+
+
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

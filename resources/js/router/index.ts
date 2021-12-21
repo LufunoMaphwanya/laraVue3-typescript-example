@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import BookIndex from '../components/books/BookIndex.vue';
 import BookShow from '../components/books/BookShow.vue';
+import BookCreate from '../components/books/BookCreate.vue';
 
 const routes = [
     {
@@ -14,6 +15,11 @@ const routes = [
         name: 'books.show',
         component: BookShow,
         props: true
+    },
+    {
+        path: '/books/create',
+        name: 'books.create',
+        component: BookCreate,
     },
     { path: "/:pathMatch(.*)", component: { template: "Not found"} }
 ];

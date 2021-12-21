@@ -1,5 +1,10 @@
 <template>
     <div class="container">
+        <div class="row">
+            <router-link :to="{ name: 'books.create' }" class="text-sm font-medium nav-link">
+                <button type="button" class="btn btn-primary">Add book</button>
+            </router-link>
+        </div>
         <div class="card" style="width: 18rem; float: left; margin: 5px" v-for="book in books" :key="book.id">
             <router-link :to="{ name: 'books.show' , params: { id: book.id }}">
                 <div class="card-body">
