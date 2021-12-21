@@ -28,7 +28,7 @@
                 </select>
             </div>
             <div class="form-group"><br/>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button :disabled="!submittable" type="submit" class="btn btn-primary">Save</button>
             </div>
         </form>
     </div>
@@ -36,7 +36,7 @@
 
 <script lang='ts'>
 import useBooks from '../../composables/books';
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 
 export default {
     setup() {
@@ -50,6 +50,12 @@ export default {
             year: null
         })
 
+        const submittable = computed(() => {
+            return form.title !== '' && form.author !== ''
+            && form.publisher !== '' && form.genre !== '' && form.year !== null;
+        });
+
+
         const saveBook = async () => {
             await storeBook({ ...form })
         }
@@ -60,7 +66,8 @@ export default {
             saveBook,
             authors,
             publishers,
-            genres
+            genres,
+            submittable
         }
     }
 }
