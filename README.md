@@ -847,6 +847,20 @@ export default {
 </script>
 ```
 
+Let's create a button to take us to this new component
+add this to your BookIndex.vue
+```vue
+<template>
+    <div class="container">
+        <div class="row">
++            <router-link :to="{ name: 'books.create' }" class="text-sm font-medium nav-link">
++                <button type="button" class="btn btn-primary">Add book</button>
++            </router-link>
+        </div>
+        <div class="card" style="width: 18rem; float: left; margin: 5px" v-for="book in books" :key="book.id">
+        .....
+```
+
 Let's add thsi to our routes so that we can access it in our app. 
 
 ```ts
