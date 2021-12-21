@@ -7,6 +7,10 @@
             <h6 class="card-subtitle mb-2 text-muted">published by: {{ book.publisher}}</h6>
             <h6 class="card-subtitle mb-2 text-muted">genre: {{ book.genre}}</h6>
        </div>
+       <div>
+
+                    <router-link :to="{ name: 'books.edit' , params: { id: `${book.id}` }}">Edit</router-link>&nbsp;
+        </div>
        <div class="row">
            <div class="col-12 border">
                <div class="card" style="width: 100%;  margin: 10px; padding: 10px;" v-for="page in 10" :key="page">

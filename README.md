@@ -1013,14 +1013,16 @@ describe("BookIndex.vue", () => {
 ```
 
 at this point, adding  :EDIT and :DELETE functionality to this should be easy enough. but let's go ahead and complete this.
+```vue
+    <h6 class="card-subtitle mb-2 text-muted">published by: {{ book.publisher}}</h6>
+            <h6 class="card-subtitle mb-2 text-muted">genre: {{ book.genre}}</h6>
+       </div>
+       <div>
 
-Delete
-
-
-
-
-
-Edit
++                    <router-link :to="{ name: 'books.edit' }" class="text-sm font-medium btn btn-secondary btn-sm">Edit</router-link>&nbsp;
++                   <router-link :to="{ name: 'books.create' }" class="text-sm font-medium btn btn-danger btn-sm">Delete</router-link>
+        </div>
+```
 
 
 

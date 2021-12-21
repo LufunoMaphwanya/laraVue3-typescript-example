@@ -34,6 +34,18 @@ export default function useBooks() {
         }
     }
 
+    const updateBook = async (id: number) => {
+        errors.value = ''
+        try {
+            await axios.put('/api/books/' + id, book.value)
+            await router.push({name: 'books.index'})
+        } catch (e: any) {
+            if (e.response.status === 422) {
+               errors.value = e.response.data.errors
+            }
+        }
+    }
+
     return {
         authors,
         publishers,
@@ -43,6 +55,7 @@ export default function useBooks() {
         book,
         getBook,
         getBooks,
-        storeBook
+        storeBook,
+        updateBook
     }
 }
