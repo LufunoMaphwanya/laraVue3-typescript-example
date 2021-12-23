@@ -1,16 +1,19 @@
-## Project set up example with Laravel 8 | Vuejs 3 Composable Api | typescript + vue jest tests starter
+#  Book Store CRUD example laravel vuejs-3
+###  Book Store CRUD example with laravel 8 and vuejs-3 composable api ( using typescript)
+<br>
 
-##### We will build a simple online book store to the help cover the following stack, these are well documented on their own but together not so much.
+#### Our stack:
 1. Laravel 8<br />
-2. Vue-3 ( with composition api)<br />
+2. Vue-3 ( using composition api)<br />
 3. Typescript for all our front end syntax<br />
-4. Front end tests on using jest and Vue-test-utils <br />
+4. Front end tests on using jest and Vue-test-utils including setup<br />
 
-#### * all set up laravel mix<br /><br />
+####  all set up with laravel mix<br /><br />
 
-Option A - [Set up complete project](#completeproject-set-up)<br>
+You may just pull the complete project or go throught the tutorial with full instructions <br>
+
+Option A - [Set up complete project](#complete-project-set-up)<br>
 Option B - [ Go through mini tutorial ( sections skippable )](#tutorial)
-
 
 ## Complete project set up
 
@@ -18,11 +21,11 @@ To set up the complete version of this project
 
 
 ```bash
-git clone git@github.com:LufunoMaphwanya/laravel-8-vuejs-3-typescript-with-jests-online-bookstore.git laravel-online-books
+git clone git@github.com:LufunoMaphwanya/laraVue3-typescript-example.git laravel-online-books
 cd laravel-online-books
 ```
 
-Create .env file.
+Create .env file
 ```bash
 cp .env.example .env
 ```
@@ -42,13 +45,13 @@ DB_PASSWORD=<YOUR_DB_PASSWORD>
 ...
 ```
 
-download project dependencies packages and run laravel mix
+download project dependencies 
 ```bash
 composer install
 php artisan migrate
 ```
 
-install front end dependencies and run mix
+install front end dependencies and run laravel mix
 ```bash
 npm install 
 npm run dev
@@ -78,25 +81,26 @@ php artisan migrate:fresh --seed
 And there you go.... <br>
 You can go ahead and customize as you please. <br><br>
 
-# B. Tutorial 
-## Our example app
-
-A simple books store where i can log in and see available books and leave reviews. ( I've ommitted roles so we will not have admin adding new books for example).
-Er diagram:
-
-<img src="https://github.com/LufunoMaphwanya/laravel-8-vuejs-3-typescript-with-jests-online-bookstore/blob/main/github/er.png?raw=true" width='500'><br>
+# Tutorial 
+  book-store example app
 
 ## Creating a Laravel online bookstore 
 ### Backend 
-1. - [Set up laravel project](#completeproject-set-up)<br>
-2. - [Models ](#completeproject-set-up)<br>
-3. - [Model relationships ](#completeproject-set-up)<br>
-3. - [Controllers and routes ](#completeproject-set-up)<br>
-4. - [Very optional - Seed database ](#completeproject-set-up)<br>
+1. - [Set up laravel project](#set-up-laravel-project)<br>
+2. - [Models ](#models)<br>
+3. - [Seed the database with test data ( optional ) ](#seed-the-database-with-test-data)<br>
+3. - [Controllers and routes ](#controllers-and-routes)<br>
+
 
 ### Frontend 
-4. - [Set up complete project](#completeproject-set-up)<br>
-5. - [Set up complete project](#completeproject-set-up)<br><br>
+
+1. [Set up our vue3 frontend](#set-up-our-frontend)<br>
+2. [Adding components - vue-compositions api based](#add-get-components)<br>
+3. [Add vue tests](#add-vue-component-tests)<br>
+4. [Add BookCreate tdd](#add-bookcreate-tdd)<br>
+5. [Add BookEdit tdd](#add-bookedit-tdd)<br>
+6. [Add BookDelete tdd](#add-bookdelete-tdd)<br>
+
 
 ## 1. Set up laravel project
 
@@ -346,28 +350,33 @@ Route::apiResource('books', BookController::class);
 Now test this by hitting localhost:8000/api/books
 
 
+<!-- ### Frontend 
+
+1. [Set up our vue3 frontend](#set-up-our-frontend)<br>
+2. [Adding components - vue-compositions api based](#add-get-components)<br>
+3. [Add tests components](#add-vue-component-tests)<br>
+4. [Add BookCreate tdd](#add-bookcreate-tdd)<br>
+5. [Add BookEdit tdd](#add-bookedit-tdd)<br>
+6. [Add BookDelete tdd](#add-bookdelete-tdd)<br> -->
+
 ## Front end 
 ### 
 
-## 1. Set up our vuejs3 front end 
+## Set up our frontend 
 
-make sure you are on node v12 -- recommended
+I recommend that you use node version 12 as my set up is. 
 ```bash
 nvm use v12
 ```
 
-Install 
-vuejs3, 
-vuejs3-loader, 
-vue-router@next and 
-typescript
+Install vuejs3, vuejs3-loader, vue-router@next and typescript
 
 ```bash
 npm install --save vue@next vue-router@next vue-loader@next
 npm install typescript ts-loader --save-dev
 ```
 
-Configure our typescript
+Let's start by configuring our typescript as we weill be using typescript for our front end modules.
 create tsconfig.json
 ```json
 /* tsconfig.json */ 
@@ -382,7 +391,7 @@ create tsconfig.json
     }
 }
 ```
-create tsconfig.json
+Add shims-vue.d.ts file so that typescript can understand our vue files.
 ```ts
 // resources/shims-vue.d.ts
 declare module '*.vue' {
@@ -401,11 +410,118 @@ mix.ts('resources/js/app.ts', 'public/js')
     .vue()
     .sass('resources/sass/app.scss', 'public/css')
     .sourceMaps();
-
  ```
- 
-let's create our components and our composable module
-create composables/books.ts
+
+ Now let's configure our vue-router routes
+ create router/index.ts
+```ts
+// resources/js/router/index.ts
+
+import { createRouter, createWebHistory } from 'vue-router';
+
+import BookIndex from '../components/books/BookIndex.vue';
+import BookShow from '../components/books/BookShow.vue';
+
+const routes = [
+    {
+        path: '/home',
+        name: 'books.index',
+        component: BookIndex
+    },
+    {
+        path: '/books/:id/show',
+        name: 'books.show',
+        component: BookShow,
+        props: true
+    },
+    { path: "/:pathMatch(.*)", component: { template: "Not found"} }
+];
+
+export default createRouter({
+    history: createWebHistory(),
+    routes
+});
+```
+
+Now let's create our components. 
+BookIndex.vue - for now we will leave it as empty and focus on set up
+```vue
+// resources/js/components/BookIndex.vue
+
+<template>
+    <div class="container">
+        empty
+    </div>
+</template>
+```
+
+BookIndex.vue - for now we will leave it as empty and focus on set up
+let's create our components 
+```vue
+// resources/js/components/BookIndex.vue
+
+<template>
+    <div class="container">
+        empty
+    </div>
+</template>
+```
+
+ let's mount our vue app - make sure to have extension as .ts
+
+```ts
+// resources/js/app.ts
+require('./bootstrap');
+
+import { createApp } from "vue";
+import router from './router';
+import BookIndex from './components/books/BookIndex.vue';
+
+const app = createApp({
+    components: {
+        BookIndex,
+    },
+}).use(router).mount('#app')
+
+```
+
+Lets's ell our laravel routes use use vue-router for url patterns matching /home
+```php
+// routes/web.php
+...
+
+Route::view('/{any}', 'home')
+    ->middleware(['auth'])
+    ->where('any', '.*');
+...
+```
+
+Add <router-view /> in our home blade file
+replace {{ you're logged in }} with 
+```php
+...
+   <router-view />
+...
+
+```
+
+We're all good, now run
+```bash 
+npm run dev
+```
+and retest your application.
+
+
+
+## Add get components
+#### Vuejs3 composition API
+Now there is a lot better rationale on why to use compositions api over options API in your vuejs3 apps<br>
+Personally, I have components not clunked up with axios logic,instead I can extract these into a grouped 'composable' that focuses on those mechanics,  <br>
+making it easir to maintain my components.
+<br>
+First we will add our composable books.ts where we will have all our api logic stored.<br>
+
+create resources/js/composables/books.ts
 ```ts
 // resources/js/composables/books.ts
 
@@ -435,7 +551,7 @@ export default function useBooks() {
 }
  ```
 
-let's create our components 
+let's update our components 
 ```vue
 // resources/js/components/BookIndex.vue
 <template>
@@ -468,7 +584,7 @@ export default {
         }
     }
 }
-</script>x
+</script>
  ```
  ```vue
 // resources/js/components/BookShow.vue
@@ -525,91 +641,15 @@ export default {
 </script>   
 
  ```
- 
- 
- Now let's configure our vue-router routes
- create router/index.ts
-```ts
-// resources/js/router/index.ts
-
-import { createRouter, createWebHistory } from 'vue-router';
-
-import BookIndex from '../components/books/BookIndex.vue';
-import BookShow from '../components/books/BookShow.vue';
-
-const routes = [
-    {
-        path: '/home',
-        name: 'books.index',
-        component: BookIndex
-    },
-    {
-        path: '/books/:id/show',
-        name: 'books.show',
-        component: BookShow,
-        props: true
-    },
-    { path: "/:pathMatch(.*)", component: { template: "Not found"} }
-];
-
-export default createRouter({
-    history: createWebHistory(),
-    routes
-});
-
- ```
- 
- and update our laravel routeer
- ```php
-// routes/web.php
-
-// .. 
-
- Route::view('/{any}', 'home')
-    ->middleware(['auth'])
-    ->where('any', '.*');
-```
-
-let's mount our app  
-```ts
-// resources/js/app.ts
-
-require('./bootstrap');
-
-import { createApp } from "vue";
-import router from './router';
-import BookIndex from './components/books/BookIndex.vue';
-
-const app = createApp({
-    components: {
-        BookIndex,
-    },
-}).use(router).mount('#app')
-
-```
-
-in our home.blade file lets include our router iew tag
-
-```blade
-// resources/views/home.blade.php
-
-...
-<div>
-    <router-view />
-</div>
-...
-
-```
-
-rerun mix
-seerver your app and enjoy
+rerun mix and test your application
 
 
-
-## 2. Set up front end tests 
+## Add vue component tests 
+We will need the following set upto get our tests running. 
 1. Jest
 2. Vue-jest and babel-jest
 3. ts-jest 
+4. vue-test-utils@3
 
 install jest and add test cmd
 
@@ -1014,17 +1054,254 @@ describe("BookIndex.vue", () => {
 
 at this point, adding  :EDIT and :DELETE functionality to this should be easy enough. but let's go ahead and complete this.
 ```vue
-    <h6 class="card-subtitle mb-2 text-muted">published by: {{ book.publisher}}</h6>
+       <h6 class="card-subtitle mb-2 text-muted">published by: {{ book.publisher}}</h6>
             <h6 class="card-subtitle mb-2 text-muted">genre: {{ book.genre}}</h6>
        </div>
-       <div>
 
-+                    <router-link :to="{ name: 'books.edit' }" class="text-sm font-medium btn btn-secondary btn-sm">Edit</router-link>&nbsp;
-+                   <router-link :to="{ name: 'books.create' }" class="text-sm font-medium btn btn-danger btn-sm">Delete</router-link>
-        </div>
+ +      <div>
+ +           <router-link id="editBtn" :to="{ name: 'books.edit' , params: { id: `${book.id}` }}">Edit</router-link>&nbsp;
+ +           <a id="deleteBtn" @click="deleteBook(book)" href="#" role="button">Delete</a>&nbsp;
+ +       </div>
+ 
+
+       <div class="row">
+           <div class="col-12 border">
 ```
 
 
+Lets's add our 2 api calls in our composable 
+```ts
+// resources/js/composables/books.ts
+
+/** Edit book **/
+const updateBook = async (id: number) => {
+    errors.value = ''
+    try {
+        await axios.put('/api/books/' + id, book.value)
+        await router.push({name: 'books.index'})
+    } catch (e: any) {
+        if (e.response.status === 422) {
+            errors.value = e.response.data.errors
+        }
+    }
+}
+
+/** Delete book **/
+
+const removeBook = async (id: number) => {
+    await axios.delete('/api/books/' + id);
+    await router.push({name: 'books.index'});
+}
+
+...
+
+return {
+    ...
+    updateBook,
+    removeBook
+}
+
+```
+
+Update vue router to know about our new route and component
+```ts
+// resources/js/router/index.ts
+
+...
+import BookEdit from '../components/books/BookEdit.vue';
+
+...
+,
+    {
+        path: '/books/:id/edit',
+        name: 'books.edit',
+        component: BookEdit,
+        props: true
+    },
+...
+```
+
+
+Let's add our new BookEdit component
+```vue
+// resources/js/components/books/BookEdit.vue
+
+<template>
+    <div class="container">
+        <form @submit.prevent="editBook">
+            <div class="form-group">
+                <label>Title: </label>
+                <input id="title" type="text" class="form-control" placeholder="book title" v-model="book.title">
+            </div>
+            <div class="form-group">
+                <label>Year: </label>
+                <input type="text" class="form-control" placeholder="book year" v-model="book.year" id="year">
+            </div>
+            <div class="form-group">
+                <label>Author: </label>
+                <select class="form-control" v-model="book.author" id="author">
+                <option v-for="author in authors" :key="author">{{ author }}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Publisher: </label>
+                <select class="form-control" v-model="book.publisher" id="publisher">
+                <option v-for="publisher in publishers" :key="publisher">{{ publisher }}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Genre: </label>
+                <select class="form-control"  v-model="book.genre" id="genre">
+                <option v-for="genre in genres" :key="genre">{{ genre }}</option>
+                </select>
+            </div>
+            <div class="form-group"><br/>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</template>
+
+<script lang='ts'>
+import useBooks from '../../composables/books';
+import { onMounted, computed } from 'vue';
+
+export default {
+    props: {
+       id: {
+           required: true,
+           type: String
+       }
+   },
+    setup(props: any) {
+        const { errors, authors, publishers, genres, book, getBook, updateBook } = useBooks();
+
+        onMounted(() => getBook(props.id))
+
+
+        const editBook = async () => {
+            await updateBook(props.id);
+        }
+
+        return {
+            book,
+            errors,
+            editBook,
+            authors,
+            publishers,
+            genres
+        }
+    }
+}
+</script>
+
+```
+
+Let's add an example test for these
+BookEdit vue component test
+```ts
+// resources/js/tests/components/books/BookEdit.spec.ts
+
+
+import { mount, shallowMount, flushPromises } from "@vue/test-utils";
+import BookEdit from "../../../components/books/BookEdit.vue";
+import router from "../../../router";
+import axios from 'axios';
+
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
+
+const testId = '3';
+const fakeBook = { "id": "3", "title": "book1", "subtitle": "hello1", "year": 1938, 'author': 'A', 'publisher': 'A', 'genre': ''}
+const fakeData = Promise.resolve({"data":{"data": fakeBook}});
+
+
+describe("BookEdit.vue", () => {
+
+    beforeEach(() => {
+    })
+
+  it("correctly prepopulates form with correct existing data", async () => {
+
+    mockedAxios.get.mockReturnValueOnce(fakeData);
+
+    const wrapper = shallowMount(BookEdit, {
+    propsData: {
+        id: testId
+    },
+      global: {
+        plugins: [router],
+      }
+    } as any);
+
+    expect(axios.get).toBeCalledWith("/api/books/"+testId);
+
+    await flushPromises();
+
+    const titleInputField: HTMLInputElement = wrapper.find('#title').element as HTMLInputElement;
+    const yearInputField: HTMLInputElement = wrapper.find('#year').element as HTMLInputElement;
+
+    const prepopTitle = titleInputField.value;
+    const prepopYear = yearInputField.value;
+
+    expect(prepopTitle).toBe(fakeBook.title);
+    expect(prepopYear).toBe(`${fakeBook.year}`);
+  });
+
+});
+
+```
+
+Now for delete, since it doesn't have it's own component, let's test that we see the delete dialog when we hit delete with the correct book title
+Let's append a test case in the BookShow.spec.ts 
+```ts
+// resources/js/tests/components/books/BookShow.spec.ts
+
+...
+it("shows user delete dialog on delete click.", async () => {
+
+    mockedAxios.get.mockReturnValueOnce(fakeData);
+    window.confirm = jest.fn(); // mock window.confirm implementation
+
+    const wrapper = shallowMount(BookShow, {
+    propsData: {
+        id: testId
+    },
+      global: {
+        plugins: [router],
+      }
+    } as any);
+
+    await flushPromises();
+
+
+    const button: HTMLElement = wrapper.find('#deleteBtn').element as HTMLElement;
+    button.click();
+
+    expect(window.confirm).toBeCalledWith(`delete  ${fakeBook.title}?`)
+  });
+
+...
+
+```
+
+I think this is good enough as a starter, you can assess your test coverage with jest adding the following in your jest config file. 
+
+```js
+...
+collectCoverage: true,
+    "collectCoverageFrom": [
+        "resources/js/**/*.{js,jsx}",
+        "resources/js/**/*.{ts,tsx}",
+        "resources/js/**/*.vue",
+        "!resources/js/tests/**/*.*",
+        "!**/node_modules/**",
+        "!**/vendor/**"
+      ],
+      ...
+```
+
+and run ```bash npm run test ``` again
 
 
 ## License

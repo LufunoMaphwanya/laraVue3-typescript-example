@@ -8,9 +8,8 @@
             <h6 class="card-subtitle mb-2 text-muted">genre: {{ book.genre}}</h6>
        </div>
        <div>
-
-        <router-link id="editBtn" :to="{ name: 'books.edit' , params: { id: `${book.id}` }}">Edit</router-link>&nbsp;
-        <a id="deleteBtn" @click="deleteBook(book)" href="#" role="button">Delete</a>&nbsp;
+            <router-link id="editBtn" :to="{ name: 'books.edit' , params: { id: `${book.id}` }}">Edit</router-link>&nbsp;
+            <a id="deleteBtn" @click="deleteBook(book)" href="#" role="button">Delete</a>&nbsp;
         </div>
        <div class="row">
            <div class="col-12 border">

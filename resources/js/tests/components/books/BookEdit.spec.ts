@@ -42,7 +42,6 @@ describe("BookEdit.vue", () => {
 
     expect(prepopTitle).toBe(fakeBook.title);
     expect(prepopYear).toBe(`${fakeBook.year}`);
-
   });
 
 });
