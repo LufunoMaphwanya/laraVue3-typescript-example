@@ -24,5 +24,5 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::view('/{any}', 'home')
-   ->middleware(['auth'])
-   ->where('any', '.*');
+    ->middleware(['auth'])
+    ->where('any', '.*');

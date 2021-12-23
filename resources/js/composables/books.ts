@@ -46,6 +46,11 @@ export default function useBooks() {
         }
     }
 
+    const removeBook = async (id: number) => {
+        await axios.delete('/api/books/' + id);
+        await router.push({name: 'books.index'});
+    }
+
     return {
         authors,
         publishers,
@@ -56,6 +61,7 @@ export default function useBooks() {
         getBook,
         getBooks,
         storeBook,
-        updateBook
+        updateBook,
+        removeBook
     }
 }
