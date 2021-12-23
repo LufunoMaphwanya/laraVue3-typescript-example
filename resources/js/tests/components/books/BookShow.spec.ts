@@ -63,5 +63,4 @@ describe("BookShow.vue", () => {
 
     expect(window.confirm).toBeCalledWith(`delete  ${fakeBook.title}?`)
   });
-
 });
